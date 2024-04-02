@@ -29,7 +29,6 @@ public abstract class Members<T extends Member> implements Iterable<T> {
 
     public abstract void add(GameProfile profile);
 
-
     public void invite(GameProfile profile) {
         this.members.put(profile.getId(), factory.createMember(profile, MemberState.INVITED));
     }

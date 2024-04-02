@@ -1,4 +1,5 @@
-- 1.20.4 Port.
-- Added guild allies (#12).
-- Added quick chat commands (#11).
-- Guild/party chat messages are now displayed in chat.
+- Fixed allies not saving
+- Fixed unhandled UUID parsing errors causing Cadmus compat to occasionally fail
+- Fixed fake players not saving
+- Made guild chat messages use chat formatting
+- added `gc` shortcut command for guild chat

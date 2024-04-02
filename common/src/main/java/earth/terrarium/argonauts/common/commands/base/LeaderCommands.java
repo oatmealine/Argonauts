@@ -20,7 +20,7 @@ public final class LeaderCommands {
                 var group = getGroupAction.getGroup(player, false);
                 CommandHelper.runAction(() -> {
                     if (group.members().isLeader(player.getUUID())) {
-                        CommandHelper.runAction(() -> removeAction.remove(group, player.server));
+                        removeAction.remove(group, player.server);
                     } else {
                         throw youAreNotTheLeaderOfGroup;
                     }
