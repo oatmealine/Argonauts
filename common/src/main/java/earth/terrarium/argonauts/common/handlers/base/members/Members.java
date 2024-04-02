@@ -29,7 +29,6 @@ public abstract class Members<T extends Member> implements Iterable<T> {
 
     public abstract void add(GameProfile profile);
 
-
     public void invite(GameProfile profile) {
         this.members.put(profile.getId(), factory.createMember(profile, MemberState.INVITED));
     }
@@ -70,6 +69,12 @@ public abstract class Members<T extends Member> implements Iterable<T> {
 
     public List<T> allMembers() {
         return new ArrayList<>(this.members.values());
+    }
+
+    public List<T> allies() {
+        List<T> allies = new ArrayList<>(this.members.values());
+        allies.removeIf(member -> member.getState() != MemberState.ALLIED);
+        return allies;
     }
 
     @NotNull

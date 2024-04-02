@@ -1,5 +1,6 @@
 package earth.terrarium.argonauts.common.handlers.guild;
 
+import com.teamresourceful.resourcefullib.common.lib.Constants;
 import com.teamresourceful.resourcefullib.common.utils.CommonUtils;
 import com.teamresourceful.resourcefullib.common.utils.SaveHandler;
 import earth.terrarium.argonauts.Argonauts;
@@ -16,6 +17,10 @@ import earth.terrarium.argonauts.common.utils.EventUtils;
 import earth.terrarium.argonauts.common.utils.ModUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,17 +41,34 @@ public class GuildHandler extends SaveHandler implements GuildApi {
             CompoundTag guildTag = tag.getCompound(key);
             CompoundTag settingsTag = guildTag.getCompound("settings");
             CompoundTag membersTag = guildTag.getCompound("members");
+            CompoundTag alliesTag = guildTag.getCompound("allies");
+            ListTag fakePlayersTag = guildTag.getList("fakePlayers", Tag.TAG_STRING);
             GuildSettings settings = new GuildSettings();
             if (!settingsTag.getCompound("hq").isEmpty()) {
                 settings.setHq(ModUtils.readGlobalPos(settingsTag.getCompound("hq")));
             }
-            settings.setDisplayName(Component.Serializer.fromJson(settingsTag.getString("name")));
-            settings.setMotd(Component.Serializer.fromJson(settingsTag.getString("motd")));
+            var name = Component.Serializer.fromJson(settingsTag.getString("name"));
+            settings.setDisplayName(name == null ? CommonComponents.EMPTY : name);
+            var motd = Component.Serializer.fromJson(settingsTag.getString("motd"));
+            settings.setMotd(motd == null ? CommonComponents.EMPTY : motd);
             settings.setColor(ChatFormatting.getById(settingsTag.getByte("color")));
+            settings.setAllowFakePlayers(settingsTag.getBoolean("allowFakePlayers"));
             GuildMembers members = new GuildMembers(ModUtils.readBasicProfile(guildTag.getCompound("owner")));
             membersTag.getAllKeys().forEach(memberTag ->
                 members.add(ModUtils.readBasicProfile(membersTag.getCompound(memberTag)))
             );
+            alliesTag.getAllKeys().forEach(allyTag ->
+                members.ally(ModUtils.readBasicProfile(alliesTag.getCompound(allyTag)))
+            );
+            for (Tag tag1 : fakePlayersTag) {
+                String uuidText = tag1.getAsString();
+                UUID uuid = ModUtils.parseUuidOrNull(uuidText);
+                if (uuid != null) {
+                    members.fakePlayers().add(uuid);
+                } else {
+                    Constants.LOGGER.warn("Failed to parse fake player uuid of {} in guild {}", uuidText, id);
+                }
+            }
             Guild guild = new Guild(id, settings, members);
             guilds.put(id, guild);
             this.updateInternal();
@@ -59,14 +81,21 @@ public class GuildHandler extends SaveHandler implements GuildApi {
             CompoundTag guildTag = new CompoundTag();
             CompoundTag settingsTag = new CompoundTag();
             CompoundTag membersTag = new CompoundTag();
+            CompoundTag alliesTag = new CompoundTag();
+            ListTag fakePlayersTag = new ListTag();
             settingsTag.put("hq", guild.settings().hq().isPresent() ? ModUtils.writeGlobalPos(guild.settings().hq().get()) : new CompoundTag());
             settingsTag.putString("name", Component.Serializer.toJson(guild.settings().displayName()));
             settingsTag.putString("motd", Component.Serializer.toJson(guild.settings().motd()));
             settingsTag.putByte("color", (byte) guild.settings().color().getId());
+            settingsTag.putBoolean("allowFakePlayers", guild.settings().allowFakePlayers());
             guildTag.put("settings", settingsTag);
             guildTag.put("owner", ModUtils.writeBasicProfile(guild.members().getLeader().profile()));
             guild.members().forEach(member -> membersTag.put(member.profile().getId().toString(), ModUtils.writeBasicProfile(member.profile())));
+            guild.members().allies().forEach(member -> alliesTag.put(member.profile().getId().toString(), ModUtils.writeBasicProfile(member.profile())));
+            guild.members().fakePlayers().forEach(fakePlayer -> fakePlayersTag.add(StringTag.valueOf(fakePlayer.toString())));
             guildTag.put("members", membersTag);
+            guildTag.put("allies", alliesTag);
+            guildTag.put("fakePlayers", fakePlayersTag);
             tag.put(uuid.toString(), guildTag);
         });
     }
