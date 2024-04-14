@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.*;
 
 public class ModUtilsImpl {
+
     private static Collection<FakePlayer> fakePlayerCache;
 
     @SuppressWarnings({"unchecked", "rawtypes"})

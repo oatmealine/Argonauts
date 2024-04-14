@@ -1,47 +1,67 @@
 package earth.terrarium.argonauts.common.utils;
 
-import com.google.common.primitives.UnsignedInteger;
-import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 import com.teamresourceful.resourcefullib.common.exceptions.NotImplementedException;
-import com.teamresourceful.resourcefullib.common.network.Packet;
+import com.teamresourceful.resourcefullib.common.utils.CommonUtils;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import earth.terrarium.argonauts.common.network.NetworkHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public final class ModUtils {
+public class ModUtils {
 
-    public static final UnsignedInteger UNSIGNED_TWO = UnsignedInteger.valueOf(2);
     public static final Pattern SPECIAL_COLOR_PATTERN = Pattern.compile("&&([0-9a-fklmnor])");
 
-    public static boolean areProfilesSame(GameProfile first, GameProfile second) {
-        if (first == null || second == null) {
-            return false;
-        }
-        if (first.getId() != null && second.getId() != null) {
-            return first.getId().equals(second.getId());
-        }
-        return first.getName() != null && second.getName() != null && first.getName().equals(second.getName());
+    private static final ChatFormatting[] COLORS = new ChatFormatting[]{
+        ChatFormatting.DARK_BLUE,
+        ChatFormatting.DARK_GREEN,
+        ChatFormatting.DARK_AQUA,
+        ChatFormatting.DARK_RED,
+        ChatFormatting.DARK_PURPLE,
+        ChatFormatting.GOLD,
+        ChatFormatting.BLUE,
+        ChatFormatting.GREEN,
+        ChatFormatting.AQUA,
+        ChatFormatting.RED,
+        ChatFormatting.LIGHT_PURPLE,
+        ChatFormatting.YELLOW,
+    };
+
+    public static ChatFormatting uuidToColor(UUID id) {
+        return COLORS[Math.abs(id.hashCode()) % COLORS.length];
     }
 
+    public static Component translatableWithStyle(String key, Object... args) {
+        for (int i = 0; i < args.length; ++i) {
+            if (!(args[i] instanceof MutableComponent component)) continue;
+            if (component.getStyle().getColor() == null) continue;
+
+            ChatFormatting color = ChatFormatting.getByName(component.getStyle().getColor().toString());
+            if (color != null) {
+                args[i] = "§" + color.getChar() + component.getString();
+            }
+        }
+
+        return Component.literal(CommonUtils.serverTranslatable(key, args).getString());
+    }
+
+    @Nullable
     public static GlobalPos readGlobalPos(CompoundTag tag) {
         ResourceLocation key = ResourceLocation.tryParse(tag.getString("dimension"));
-        if (key == null) {
-            return null;
-        }
+        if (key == null) return null;
         BlockPos pos = BlockPos.of(tag.getLong("pos"));
         ResourceKey<Level> level = ResourceKey.create(Registries.DIMENSION, key);
         return GlobalPos.of(level, pos);
@@ -51,17 +71,6 @@ public final class ModUtils {
         CompoundTag tag = new CompoundTag();
         tag.putString("dimension", pos.dimension().location().toString());
         tag.putLong("pos", pos.pos().asLong());
-        return tag;
-    }
-
-    public static GameProfile readBasicProfile(CompoundTag tag) {
-        return new GameProfile(UUID.fromString(tag.getString("id")), tag.getString("name"));
-    }
-
-    public static CompoundTag writeBasicProfile(GameProfile profile) {
-        CompoundTag tag = new CompoundTag();
-        tag.putString("id", profile.getId().toString());
-        tag.putString("name", profile.getName());
         return tag;
     }
 
@@ -79,22 +88,5 @@ public final class ModUtils {
     @ExpectPlatform
     public static Component getParsedComponent(Component component, ServerPlayer player) {
         throw new NotImplementedException();
-    }
-
-    // Sends to all clients that have Argonauts installed
-    public static <T extends Packet<T>> void sendToAllClientPlayers(T packet, MinecraftServer server) {
-        server.getPlayerList().getPlayers().forEach(player -> {
-            if (NetworkHandler.CHANNEL.canSendToPlayer(player, packet.type())) {
-                NetworkHandler.CHANNEL.sendToPlayer(packet, player);
-            }
-        });
-    }
-
-    public static UUID parseUuidOrNull(String text) {
-        try {
-            return UUID.fromString(text);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 }

@@ -1,14 +1,17 @@
 package earth.terrarium.argonauts.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.teamresourceful.resourcefullib.client.utils.ScreenUtils;
+import earth.terrarium.argonauts.Argonauts;
+import earth.terrarium.argonauts.client.compat.prometheus.PrometheusClientCompat;
+import earth.terrarium.argonauts.client.screens.chat.ChatScreen;
+import earth.terrarium.argonauts.common.chat.ChatHandler;
 import earth.terrarium.argonauts.common.constants.ConstantComponents;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class ArgonautsClient {
 
@@ -22,18 +25,22 @@ public class ArgonautsClient {
         ConstantComponents.ODYSSEY_CATEGORY.getString());
 
     public static void init() {
-    }
-
-    public static <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void register(MenuType<? extends M> type, MenuScreens.ScreenConstructor<M, U> factory) {
-        MenuScreens.register(type, factory);
+        if (Argonauts.IS_PROMETHEUS_LOADED) {
+            PrometheusClientCompat.init();
+        }
     }
 
     public static void clientTick() {
-        if (KEY_OPEN_PARTY_CHAT.consumeClick()) {
-            ScreenUtils.sendCommand("party chat");
-        }
-        if (KEY_OPEN_GUILD_CHAT.consumeClick()) {
-            ScreenUtils.sendCommand("guild chat");
-        }
+        if (KEY_OPEN_PARTY_CHAT.consumeClick()) ChatScreen.openParty();
+        if (KEY_OPEN_GUILD_CHAT.consumeClick()) ChatScreen.openGuild();
+    }
+
+    @NotNull
+    public static Level level() {
+        return Objects.requireNonNull(Minecraft.getInstance().level);
+    }
+
+    public static void onPlayerLoggedOut() {
+        ChatHandler.clearChannels();
     }
 }

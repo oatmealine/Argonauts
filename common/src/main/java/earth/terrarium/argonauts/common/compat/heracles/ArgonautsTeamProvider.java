@@ -1,20 +1,19 @@
 package earth.terrarium.argonauts.common.compat.heracles;
 
-import com.mojang.authlib.GameProfile;
-import earth.terrarium.argonauts.api.guild.Guild;
-import earth.terrarium.argonauts.api.guild.GuildApi;
-import earth.terrarium.argonauts.common.handlers.base.members.MemberState;
-import earth.terrarium.argonauts.common.handlers.guild.members.GuildMember;
+import earth.terrarium.argonauts.api.teams.guild.Guild;
+import earth.terrarium.argonauts.api.teams.guild.GuildApi;
 import earth.terrarium.heracles.api.teams.TeamProvider;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public class ArgonautsTeamProvider implements TeamProvider {
+
     public static BiConsumer<ServerLevel, UUID> changer;
 
     @Override
@@ -23,16 +22,15 @@ public class ArgonautsTeamProvider implements TeamProvider {
     }
 
     @Override
-    public Stream<List<UUID>> getTeams(ServerLevel level, UUID player) {
-        Guild guild = GuildApi.API.getPlayerGuild(level.getServer(), player);
+    public Stream<List<UUID>> getTeams(ServerLevel level, UUID playerId) {
+        Guild guild = GuildApi.API.getPlayerGuild(level, playerId).orElse(null);
         if (guild == null) return Stream.empty();
         return Stream.of(guild.members()
-            .allMembers()
+            .entrySet()
             .stream()
-            .filter(member -> member.getState().isPermanentMember())
-            .map(GuildMember::profile)
-            .map(GameProfile::getId)
-            .filter(uuid -> !uuid.equals(player))
+            .filter(member -> member.getValue().status().isMember())
+            .map(Map.Entry::getKey)
+            .filter(id -> !id.equals(playerId))
             .toList());
     }
 

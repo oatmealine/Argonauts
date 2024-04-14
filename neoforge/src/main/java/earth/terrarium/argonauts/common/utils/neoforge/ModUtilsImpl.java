@@ -11,6 +11,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import java.util.*;
 
 public class ModUtilsImpl {
+
     private static Collection<FakePlayer> fakePlayerCache;
     private static long lastTry = 0;
 

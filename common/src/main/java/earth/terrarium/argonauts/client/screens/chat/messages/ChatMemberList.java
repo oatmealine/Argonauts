@@ -44,7 +44,7 @@ public class ChatMemberList extends SelectionList<ListEntry> {
         }
 
         @Override
-        public void setFocused(boolean bl) {
+        public void setFocused(boolean focused) {
 
         }
 

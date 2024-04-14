@@ -10,10 +10,12 @@ public class ArgonautsReiClientPlugin implements REIClientPlugin {
     @Override
     public void registerFavorites(FavoriteEntryType.Registry registry) {
         registry.register(PartyChatFavoriteEntry.ID, PartyChatFavoriteEntry.Type.INSTANCE);
-        registry.register(PartyManagementFavoriteEntry.ID, PartyManagementFavoriteEntry.Type.INSTANCE);
+        registry.register(GuildChatFavoriteEntry.ID, GuildChatFavoriteEntry.Type.INSTANCE);
+        registry.register(PartyMembersFavoriteEntry.ID, PartyMembersFavoriteEntry.Type.INSTANCE);
+        registry.register(GuildMembersFavoriteEntry.ID, GuildMembersFavoriteEntry.Type.INSTANCE);
         registry.getOrCrateSection(Component.translatable("rei.sections.odyssey"))
             .add(
                 new PartyChatFavoriteEntry(),
-                new PartyManagementFavoriteEntry());
+                new PartyMembersFavoriteEntry());
     }
 }

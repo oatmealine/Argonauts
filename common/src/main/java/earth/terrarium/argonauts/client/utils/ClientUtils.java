@@ -2,23 +2,22 @@ package earth.terrarium.argonauts.client.utils;
 
 import it.unimi.dsi.fastutil.chars.Char2CharMap;
 import it.unimi.dsi.fastutil.chars.Char2CharOpenHashMap;
+import net.minecraft.Util;
 
 public class ClientUtils {
 
-    private static final Char2CharMap SMALL_NUMBERS = new Char2CharOpenHashMap();
-
-    static {
-        SMALL_NUMBERS.put('0', '₀');
-        SMALL_NUMBERS.put('1', '₁');
-        SMALL_NUMBERS.put('2', '₂');
-        SMALL_NUMBERS.put('3', '₃');
-        SMALL_NUMBERS.put('4', '₄');
-        SMALL_NUMBERS.put('5', '₅');
-        SMALL_NUMBERS.put('6', '₆');
-        SMALL_NUMBERS.put('7', '₇');
-        SMALL_NUMBERS.put('8', '₈');
-        SMALL_NUMBERS.put('9', '₉');
-    }
+    private static final Char2CharMap SMALL_NUMBERS = Util.make(new Char2CharOpenHashMap(), map -> {
+        map.put('0', '₀');
+        map.put('1', '₁');
+        map.put('2', '₂');
+        map.put('3', '₃');
+        map.put('4', '₄');
+        map.put('5', '₅');
+        map.put('6', '₆');
+        map.put('7', '₇');
+        map.put('8', '₈');
+        map.put('9', '₉');
+    });
 
     public static String getSmallNumber(int num) {
         String normal = String.valueOf(num);

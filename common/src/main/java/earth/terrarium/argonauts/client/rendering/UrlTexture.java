@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class UrlTexture extends SimpleTexture {
 
-    private static final Map<String, UrlTexture.Info> INFO = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
+    private static final Map<String, Info> INFO = Object2ObjectMaps.synchronize(new Object2ObjectOpenHashMap<>());
     private static final Info DEFAULT_INFO = new Info(24, 24, 24, 24);
 
     private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(Argonauts.MOD_ID, "textures/gui/hourglass.png");
@@ -59,7 +59,9 @@ public class UrlTexture extends SimpleTexture {
             if (!this.loaded) {
                 try {
                     super.load(manager);
-                } catch (IOException ignored) {}
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 this.loaded = true;
             }
         });
@@ -81,7 +83,6 @@ public class UrlTexture extends SimpleTexture {
                                             }
                                         });
                                     }
-
                                 });
                             }
                         }),
@@ -96,7 +97,9 @@ public class UrlTexture extends SimpleTexture {
 
         try {
             nativeImage = NativeImage.read(stream);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return nativeImage;
     }

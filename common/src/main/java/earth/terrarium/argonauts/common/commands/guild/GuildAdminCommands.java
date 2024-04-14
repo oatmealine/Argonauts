@@ -3,82 +3,96 @@ package earth.terrarium.argonauts.common.commands.guild;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.teamresourceful.resourcefullib.common.utils.CommonUtils;
-import earth.terrarium.argonauts.api.guild.Guild;
-import earth.terrarium.argonauts.api.guild.GuildApi;
-import earth.terrarium.argonauts.common.commands.base.CommandHelper;
-import earth.terrarium.argonauts.common.handlers.base.MemberException;
+import earth.terrarium.argonauts.api.teams.guild.Guild;
+import earth.terrarium.argonauts.api.teams.guild.GuildApi;
+import earth.terrarium.argonauts.common.commands.TeamExceptions;
+import earth.terrarium.argonauts.common.guild.GuildSaveData;
+import earth.terrarium.argonauts.common.permissions.Permissions;
+import earth.terrarium.argonauts.common.settings.Settings;
+import earth.terrarium.argonauts.common.utils.ModUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.Collection;
+import java.util.UUID;
 
 public class GuildAdminCommands {
 
-    private static final SuggestionProvider<CommandSourceStack> GUILDS_SUGGESTION_PROVIDER = (context, builder) -> {
-        Collection<Guild> guilds = GuildApi.API.getAll(context.getSource().getServer());
-        return SharedSuggestionProvider.suggest((guilds.stream().map(g -> g.id().toString())), builder);
-    };
+    public static final SuggestionProvider<CommandSourceStack> GUILDS_SUGGESTION_PROVIDER = (context, builder) ->
+        SharedSuggestionProvider.suggest(
+            GuildApi.API.getAll(context.getSource().getLevel()),
+            builder,
+            guild -> guild.id().toString(),
+            Guild::displayName
+        );
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("guild")
+            .requires(source -> source.hasPermission(2))
             .then(Commands.literal("admin")
-                .requires(source -> source.hasPermission(2))
-                .then(Commands.literal("disband")
-                    .then(Commands.argument("guild", UuidArgument.uuid())
+                .then(Commands.literal("join")
+                    .then(Commands.argument("id", UuidArgument.uuid())
                         .suggests(GUILDS_SUGGESTION_PROVIDER)
                         .executes(context -> {
-                            ServerPlayer player = context.getSource().getPlayerOrException();
-                            Guild guild = GuildApi.API.get(player.server, UuidArgument.getUuid(context, "guild"));
-                            removeGuild(guild, player);
+                            join(context.getSource(), UuidArgument.getUuid(context, "id"));
                             return 1;
-                        })))
+                        })
+                    )
+                )
+                .then(Commands.literal("disband")
+                    .then(Commands.argument("id", UuidArgument.uuid())
+                        .suggests(GUILDS_SUGGESTION_PROVIDER)
+                        .executes(context -> {
+                            disband(context.getSource(), UuidArgument.getUuid(context, "id"));
+                            return 1;
+                        })
+                    )
+                )
                 .then(Commands.literal("disbandall")
                     .executes(context -> {
-                        ServerPlayer player = context.getSource().getPlayerOrException();
-                        GuildApi.API.getAll(player.server).forEach(guild -> {
-                            try {
-                                removeGuild(guild, player);
-                            } catch (CommandSyntaxException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                        disbandAll(context.getSource());
                         return 1;
-                    }))
-                .then(Commands.literal("join")
-                    .then(Commands.argument("guild", UuidArgument.uuid())
-                        .suggests(GUILDS_SUGGESTION_PROVIDER)
-                        .executes(context -> {
-                            ServerPlayer player = context.getSource().getPlayerOrException();
-                            Guild guild = GuildApi.API.get(player.server, UuidArgument.getUuid(context, "guild"));
-                            joinGuild(guild, player);
-                            return 1;
-                        })))
-            ));
+                    })
+                )
+            )
+        );
     }
 
-    public static void removeGuild(Guild guild, ServerPlayer player) throws CommandSyntaxException {
-        CommandHelper.runAction(() -> {
-            if (guild == null) throw MemberException.GUILD_DOES_NOT_EXIST;
-            player.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.member.guild_disband", guild.settings().displayName().getString()), false);
-            guild.members().forEach(p -> {
-                ServerPlayer groupMember = player.server.getPlayerList().getPlayer(p.profile().getId());
-                if (groupMember != null) {
-                    groupMember.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.member.disband", guild.displayName()), false);
-                }
-            });
-            GuildApi.API.remove(true, guild, player.server);
-        });
+    private static void join(CommandSourceStack source, UUID id) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Guild guild = GuildApi.API.get(source.getLevel(), id).orElse(null);
+        if (guild == null) throw TeamExceptions.GUILD_DOES_NOT_EXIST.create();
+        if (GuildApi.API.getPlayerGuild(player).isPresent()) throw TeamExceptions.ALREADY_IN_GUILD.create();
+
+        GuildApi.API.join(source.getLevel(), guild, id);
+        GuildApi.API.modifyPermission(source.getLevel(), guild, player.getUUID(), Permissions.OPERATOR, true);
+
+        if (Settings.ANNOUNCE_JOIN.get(guild)) {
+            guild.onlineMembers(source.getLevel())
+                .stream()
+                .filter(member -> !member.getUUID().equals(player.getUUID()))
+                .forEach(member -> member.displayClientMessage(ModUtils.translatableWithStyle("command.argonauts.joined_guild", player.getName()), false));
+        }
+        source.sendSuccess(() -> ModUtils.translatableWithStyle("command.argonauts.join_guild", guild.displayName()), false);
     }
 
-    public static void joinGuild(Guild guild, ServerPlayer player) throws CommandSyntaxException {
-        CommandHelper.runAction(() -> {
-            if (guild == null) throw MemberException.GUILD_DOES_NOT_EXIST;
-            GuildApi.API.join(guild, player);
+    private static void disband(CommandSourceStack source, UUID id) throws CommandSyntaxException {
+        Guild guild = GuildApi.API.get(source.getLevel(), id).orElse(null);
+        if (guild == null) throw TeamExceptions.GUILD_DOES_NOT_EXIST.create();
+        GuildApi.API.disband(source.getLevel(), guild);
+        source.sendSuccess(() -> ModUtils.translatableWithStyle("command.argonauts.guild_disband", guild.displayName()), false);
+    }
+
+    private static void disbandAll(CommandSourceStack source) {
+        GuildApi.API.getAll(source.getLevel()).forEach(guild -> {
+            GuildApi.API.disband(source.getLevel(), guild);
+            var data = GuildSaveData.read(source.getLevel());
+            data.guilds().clear();
+            data.guildsByPlayer().clear();
+            data.setDirty();
+            source.sendSuccess(() -> ModUtils.translatableWithStyle("command.argonauts.guild_disband", guild.displayName()), false);
         });
     }
 }
-

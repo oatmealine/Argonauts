@@ -68,12 +68,15 @@ public class SpotifyTrackEmbeder implements Embeder {
                     SpotifyTrackInfo info = INFO.get(url);
                     if (info == null) return;
                     info.update(object);
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }, Util.backgroundExecutor())
         ));
     }
 
     private static class SpotifyTrackInfo {
+
         private final CompletableFuture<?> future;
         private String image;
         private String title;

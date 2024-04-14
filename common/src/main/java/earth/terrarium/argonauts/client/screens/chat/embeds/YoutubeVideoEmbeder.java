@@ -74,12 +74,15 @@ public class YoutubeVideoEmbeder implements Embeder {
                     YoutubeVideoInfo info = INFO.get(url);
                     if (info == null) return;
                     info.update(object);
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }, Util.backgroundExecutor())
         ));
     }
 
     private static class YoutubeVideoInfo {
+
         private final CompletableFuture<?> future;
         private String image;
         private String title;

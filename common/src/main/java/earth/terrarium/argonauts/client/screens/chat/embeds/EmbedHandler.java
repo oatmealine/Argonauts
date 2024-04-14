@@ -33,6 +33,8 @@ public class EmbedHandler {
             if (handler != null) {
                 handler.handle(graphics, uri);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

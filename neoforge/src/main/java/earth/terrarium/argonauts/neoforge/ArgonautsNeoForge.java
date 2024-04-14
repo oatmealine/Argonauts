@@ -1,26 +1,26 @@
 package earth.terrarium.argonauts.neoforge;
 
 import earth.terrarium.argonauts.Argonauts;
-import earth.terrarium.argonauts.client.ArgonautsClient;
-import earth.terrarium.argonauts.common.commands.ModCommands;
+import earth.terrarium.argonauts.client.neoforge.ArgonautsClientNeoForge;
+import earth.terrarium.argonauts.common.commands.ArgonautsCommands;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 @Mod(Argonauts.MOD_ID)
 public class ArgonautsNeoForge {
+
     public ArgonautsNeoForge() {
         Argonauts.init();
-
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ArgonautsNeoForge::onClientSetup);
-        var bus = NeoForge.EVENT_BUS;
-        bus.addListener(ArgonautsNeoForge::onPlayerLoggedIn);
-        bus.addListener(ArgonautsNeoForge::onPlayerLoggedOut);
-        bus.addListener(ArgonautsNeoForge::registerCommands);
+        NeoForge.EVENT_BUS.addListener(ArgonautsNeoForge::onPlayerLoggedIn);
+        NeoForge.EVENT_BUS.addListener(ArgonautsNeoForge::onPlayerLoggedOut);
+        NeoForge.EVENT_BUS.addListener(ArgonautsNeoForge::registerCommands);
+        if (FMLEnvironment.dist.isClient()) {
+            ArgonautsClientNeoForge.init();
+        }
     }
 
     private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
@@ -35,11 +35,7 @@ public class ArgonautsNeoForge {
         }
     }
 
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        ArgonautsClient.init();
-    }
-
     private static void registerCommands(RegisterCommandsEvent event) {
-        ModCommands.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        ArgonautsCommands.register(event.getDispatcher());
     }
 }
