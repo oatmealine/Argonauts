@@ -96,7 +96,9 @@ public final class GuildManageCommands {
                         throw MemberException.NOT_AN_ALLY;
                     }
 
-                    GuildApi.API.leave(guild.id(), target);
+                    guild.members().remove(target.getUUID());
+                    player.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.remove_ally", target.getName().getString()), false);
+                    target.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.no_longer_allied", guild.displayName()), false);
                 });
                 return 1;
             }));

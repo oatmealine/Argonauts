@@ -56,6 +56,8 @@
     "text.argonauts.member.party_invite": "You've been invited to join %s's Party",
     "text.argonauts.member.guild_invite": "You've been invited to join guild: %s",
     "text.argonauts.member.guild_allied": "You are now allied with %s's Guild",
+    "text.argonauts.remove_ally": "%s is no longer allied to your guild",
+    "text.argonauts.no_longer_allied": "You are no longer allied to %s",
     "text.argonauts.member.click_to_join": "§bClick here to join",
     "text.argonauts.member.join": "Join \"%s\"",
 

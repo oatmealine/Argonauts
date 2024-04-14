@@ -1,5 +1,1 @@
-- Fixed allies not saving
-- Fixed unhandled UUID parsing errors causing Cadmus compat to occasionally fail
-- Fixed fake players not saving
-- Made guild chat messages use chat formatting
-- added `gc` shortcut command for guild chat
+- Fixed not being able to remove allies
