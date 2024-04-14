@@ -3,11 +3,17 @@ package earth.terrarium.argonauts.api.client.party;
 import earth.terrarium.argonauts.api.ApiHelper;
 import earth.terrarium.argonauts.api.party.Party;
 import net.minecraft.client.player.LocalPlayer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * This API has been merged with the {@link earth.terrarium.argonauts.api.party.PartyApi} in 1.21.
+ */
+@Deprecated(forRemoval = true)
+@ApiStatus.ScheduledForRemoval(inVersion = "1.21")
 public interface PartyClientApi {
 
     PartyClientApi API = ApiHelper.load(PartyClientApi.class);

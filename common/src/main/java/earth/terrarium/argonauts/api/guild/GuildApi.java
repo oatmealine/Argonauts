@@ -5,11 +5,17 @@ import earth.terrarium.argonauts.common.handlers.base.MemberException;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * This API is being heavily reworked in 1.21.
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.21")
 public interface GuildApi {
 
     GuildApi API = ApiHelper.load(GuildApi.class);

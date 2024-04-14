@@ -11,6 +11,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * This API is being heavily reworked in 1.21.
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.21")
 public interface PartyApi {
 
     PartyApi API = ApiHelper.load(PartyApi.class);
