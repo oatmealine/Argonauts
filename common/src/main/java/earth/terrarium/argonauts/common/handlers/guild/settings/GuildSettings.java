@@ -23,20 +23,11 @@ public class GuildSettings {
     public GuildSettings() {}
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public GuildSettings(Optional<GlobalPos> hq, Component displayName, Component motd, ChatFormatting color, boolean allowFakePlayers) {
-        this.hq = hq.orElse(null);
+    public GuildSettings(Component displayName, Component motd, ChatFormatting color, boolean allowFakePlayers) {
         this.displayName = displayName;
         this.motd = motd;
         this.color = color;
         this.allowFakePlayers = allowFakePlayers;
-    }
-
-    public void setHq(@Nullable GlobalPos hq) {
-        this.hq = hq;
-    }
-
-    public Optional<GlobalPos> hq() {
-        return Optional.ofNullable(hq);
     }
 
     public void setDisplayName(Component displayName) {
@@ -72,7 +63,6 @@ public class GuildSettings {
     }
 
     public static final ByteCodec<GuildSettings> BYTE_CODEC = ObjectByteCodec.create(
-        ExtraByteCodecs.GLOBAL_POS.optionalFieldOf(GuildSettings::hq),
         ExtraByteCodecs.COMPONENT.fieldOf(GuildSettings::displayName),
         ExtraByteCodecs.COMPONENT.fieldOf(GuildSettings::motd),
         ByteCodec.ofEnum(ChatFormatting.class).fieldOf(GuildSettings::color),

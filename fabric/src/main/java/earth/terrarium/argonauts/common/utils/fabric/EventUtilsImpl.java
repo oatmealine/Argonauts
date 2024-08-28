@@ -3,16 +3,9 @@ package earth.terrarium.argonauts.common.utils.fabric;
 import earth.terrarium.argonauts.api.guild.Guild;
 import earth.terrarium.argonauts.fabric.events.GuildEvents;
 import earth.terrarium.argonauts.fabric.events.GuildMemberEvents;
-import earth.terrarium.argonauts.fabric.events.PlayerTeleportEvents;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 
 public class EventUtilsImpl {
-
-    public static boolean tpCommand(ServerPlayer player, BlockPos target) {
-        return PlayerTeleportEvents.COMMAND.invoker().check(player, target.getX(), target.getY(), target.getZ());
-    }
-
     public static void created(Guild guild, ServerPlayer creator) {
         GuildEvents.CREATED.invoker().create(creator, guild);
     }

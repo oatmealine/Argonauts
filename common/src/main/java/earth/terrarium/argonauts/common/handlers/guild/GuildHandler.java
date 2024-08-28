@@ -41,9 +41,6 @@ public class GuildHandler extends SaveHandler implements GuildApi {
             CompoundTag alliesTag = guildTag.getCompound("allies");
             ListTag fakePlayersTag = guildTag.getList("fakePlayers", Tag.TAG_STRING);
             GuildSettings settings = new GuildSettings();
-            if (!settingsTag.getCompound("hq").isEmpty()) {
-                settings.setHq(ModUtils.readGlobalPos(settingsTag.getCompound("hq")));
-            }
             var name = Component.Serializer.fromJson(settingsTag.getString("name"));
             settings.setDisplayName(name == null ? CommonComponents.EMPTY : name);
             var motd = Component.Serializer.fromJson(settingsTag.getString("motd"));
@@ -80,7 +77,6 @@ public class GuildHandler extends SaveHandler implements GuildApi {
             CompoundTag membersTag = new CompoundTag();
             CompoundTag alliesTag = new CompoundTag();
             ListTag fakePlayersTag = new ListTag();
-            settingsTag.put("hq", guild.settings().hq().isPresent() ? ModUtils.writeGlobalPos(guild.settings().hq().get()) : new CompoundTag());
             settingsTag.putString("name", Component.Serializer.toJson(guild.settings().displayName()));
             settingsTag.putString("motd", Component.Serializer.toJson(guild.settings().motd()));
             settingsTag.putByte("color", (byte) guild.settings().color().getId());

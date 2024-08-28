@@ -11,11 +11,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 
 public class ArgonautsClient {
-
-    public static final KeyMapping KEY_OPEN_PARTY_CHAT = new KeyMapping(
-        ConstantComponents.KEY_OPEN_PARTY_CHAT.getString(),
-        InputConstants.UNKNOWN.getValue(),
-        ConstantComponents.ODYSSEY_CATEGORY.getString());
     public static final KeyMapping KEY_OPEN_GUILD_CHAT = new KeyMapping(
         ConstantComponents.KEY_OPEN_GUILD_CHAT.getString(),
         InputConstants.UNKNOWN.getValue(),
@@ -29,9 +24,6 @@ public class ArgonautsClient {
     }
 
     public static void clientTick() {
-        if (KEY_OPEN_PARTY_CHAT.consumeClick()) {
-            ScreenUtils.sendCommand("party chat");
-        }
         if (KEY_OPEN_GUILD_CHAT.consumeClick()) {
             ScreenUtils.sendCommand("guild chat");
         }

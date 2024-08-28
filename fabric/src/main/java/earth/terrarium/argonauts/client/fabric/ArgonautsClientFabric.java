@@ -10,7 +10,6 @@ public class ArgonautsClientFabric implements ClientModInitializer {
     public void onInitializeClient() {
         ArgonautsClient.init();
         ClientTickEvents.START_CLIENT_TICK.register(client -> ArgonautsClient.clientTick());
-        KeyBindingHelper.registerKeyBinding(ArgonautsClient.KEY_OPEN_PARTY_CHAT);
         KeyBindingHelper.registerKeyBinding(ArgonautsClient.KEY_OPEN_GUILD_CHAT);
     }
 }

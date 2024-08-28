@@ -25,41 +25,11 @@ public final class GuildSettingsCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("guild")
             .then(Commands.literal("settings")
-                .then(hq())
                 .then(displayName())
                 .then(motd())
                 .then(color())
                 .then(allowFakePlayers())
             ));
-    }
-
-    private static ArgumentBuilder<CommandSourceStack, LiteralArgumentBuilder<CommandSourceStack>> hq() {
-        return Commands.literal("hq")
-            .then(Commands.literal("set")
-                .executes(context -> {
-                    ServerPlayer player = context.getSource().getPlayerOrException();
-                    CommandHelper.runAction(() -> {
-                        BlockPos pos = player.blockPosition();
-                        Guild guild = GuildCommandHelper.getGuildOrThrow(player, false);
-                        if (!guild.members().isLeader(player.getUUID())) {
-                            throw MemberException.YOU_ARE_NOT_THE_OWNER_OF_GUILD;
-                        }
-                        guild.settings().setHq(GlobalPos.of(player.level().dimension(), pos));
-                        player.displayClientMessage(setCurrentComponent("hq", player.level().dimension().location() + ", " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()), false);
-                    });
-                    return 1;
-                }))
-            .executes(context -> {
-                ServerPlayer player = context.getSource().getPlayerOrException();
-                CommandHelper.runAction(() -> {
-                    Guild guild = GuildCommandHelper.getGuildOrThrow(player, false);
-                    var hq = guild.settings().hq();
-                    if (hq.isEmpty()) throw MemberException.HQ_NOT_SET;
-
-                    hq.ifPresent(hq1 -> player.displayClientMessage(getCurrentComponent("hq", hq1.dimension().location() + ", " + hq1.pos().getX() + ", " + hq1.pos().getY() + ", " + hq1.pos().getZ()), false));
-                });
-                return 1;
-            });
     }
 
     private static ArgumentBuilder<CommandSourceStack, LiteralArgumentBuilder<CommandSourceStack>> displayName() {
