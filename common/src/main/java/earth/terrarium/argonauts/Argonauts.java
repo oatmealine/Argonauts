@@ -78,9 +78,9 @@ public class Argonauts {
                     // sync otherPlayer advancements to player
                     AdvancementProgress otherAdvancementProgress = otherPlayer.getAdvancements().getOrStartProgress(advancement);
                     if (otherAdvancementProgress.isDone()) {
-                        AdvancementProgress advancementProgress = otherPlayer.getAdvancements().getOrStartProgress(advancement);
-                        if (!advancementProgress.isDone()) {
-                            for(String s : advancementProgress.getRemainingCriteria()) {
+                        AdvancementProgress advancementProgress_ = otherPlayer.getAdvancements().getOrStartProgress(advancement);
+                        if (!advancementProgress_.isDone()) {
+                            for(String s : advancementProgress_.getRemainingCriteria()) {
                                 ((ServerPlayer) player).getAdvancements().award(advancement, s);
                             }
                         }
