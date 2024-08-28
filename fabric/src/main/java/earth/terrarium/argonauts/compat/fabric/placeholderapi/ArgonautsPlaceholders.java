@@ -2,7 +2,6 @@ package earth.terrarium.argonauts.compat.fabric.placeholderapi;
 
 import earth.terrarium.argonauts.Argonauts;
 import earth.terrarium.argonauts.api.guild.GuildApi;
-import earth.terrarium.argonauts.api.party.PartyApi;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
@@ -22,15 +21,6 @@ public class ArgonautsPlaceholders {
             if (guild == null) return PlaceholderResult.invalid("No Guild");
 
             return PlaceholderResult.value(guild.displayName());
-        });
-
-        Placeholders.register(new ResourceLocation(Argonauts.MOD_ID, "party"), (ctx, arg) -> {
-            if (!ctx.hasPlayer()) return PlaceholderResult.invalid("No Player");
-
-            var party = PartyApi.API.getPlayerParty(Objects.requireNonNull(ctx.player()).getUUID());
-            if (party == null) return PlaceholderResult.invalid("No Party");
-
-            return PlaceholderResult.value(party.displayName());
         });
     }
 

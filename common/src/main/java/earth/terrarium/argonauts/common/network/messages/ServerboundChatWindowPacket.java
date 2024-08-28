@@ -8,8 +8,6 @@ import com.teamresourceful.resourcefullib.common.utils.CommonUtils;
 import earth.terrarium.argonauts.Argonauts;
 import earth.terrarium.argonauts.api.guild.Guild;
 import earth.terrarium.argonauts.api.guild.GuildApi;
-import earth.terrarium.argonauts.api.party.Party;
-import earth.terrarium.argonauts.api.party.PartyApi;
 import earth.terrarium.argonauts.common.handlers.base.members.Group;
 import earth.terrarium.argonauts.common.handlers.base.members.Member;
 import earth.terrarium.argonauts.common.handlers.chat.ChatHandler;
@@ -61,12 +59,6 @@ public record ServerboundChatWindowPacket(String message,
             return (player, level) -> {
                 ServerPlayer serverPlayer = (ServerPlayer) player;
                 switch (message.type()) {
-                    case PARTY -> {
-                        Party party = PartyApi.API.get(serverPlayer);
-                        if (party == null) return;
-                        MessageChannel channel = ChatHandler.getChannel(party, message.type());
-                        sendMessage(serverPlayer, party, message.message, channel);
-                    }
                     case GUILD -> {
                         Guild guild = GuildApi.API.get(serverPlayer);
                         if (guild == null) return;

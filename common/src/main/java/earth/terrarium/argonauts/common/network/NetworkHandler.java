@@ -10,22 +10,16 @@ public class NetworkHandler {
     public static final NetworkChannel CHANNEL = new NetworkChannel(Argonauts.MOD_ID, 1, "main", true);
 
     public static void init() {
-        CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ServerboundSetSettingPacket.ID, ServerboundSetSettingPacket.HANDLER, ServerboundSetSettingPacket.class);
         CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ServerboundSetPermissionPacket.ID, ServerboundSetPermissionPacket.HANDLER, ServerboundSetPermissionPacket.class);
         CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ServerboundSetRolePacket.ID, ServerboundSetRolePacket.HANDLER, ServerboundSetRolePacket.class);
         CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ServerboundChatWindowPacket.ID, ServerboundChatWindowPacket.HANDLER, ServerboundChatWindowPacket.class);
-        CHANNEL.registerPacket(NetworkDirection.CLIENT_TO_SERVER, ServerboundRequestShowCadmusPermissionsPacket.ID, ServerboundRequestShowCadmusPermissionsPacket.HANDLER, ServerboundRequestShowCadmusPermissionsPacket.class);
 
         CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundDeleteMessagePacket.ID, ClientboundDeleteMessagePacket.HANDLER, ClientboundDeleteMessagePacket.class);
         CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundReceiveMessagePacket.ID, ClientboundReceiveMessagePacket.HANDLER, ClientboundReceiveMessagePacket.class);
-        CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundReceiveShowCadmusPermissionsPacket.ID, ClientboundReceiveShowCadmusPermissionsPacket.HANDLER, ClientboundReceiveShowCadmusPermissionsPacket.class);
 
         CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundOpenChatMenuPacket.ID, ClientboundOpenChatMenuPacket.HANDLER, ClientboundOpenChatMenuPacket.class);
         CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundOpenGuildMemberMenuPacket.ID, ClientboundOpenGuildMemberMenuPacket.HANDLER, ClientboundOpenGuildMemberMenuPacket.class);
-        CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundOpenPartyMemberMenuPacket.ID, ClientboundOpenPartyMemberMenuPacket.HANDLER, ClientboundOpenPartyMemberMenuPacket.class);
-        CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundOpenPartySettingsMenuPacket.ID, ClientboundOpenPartySettingsMenuPacket.HANDLER, ClientboundOpenPartySettingsMenuPacket.class);
 
         CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundSyncGuildsPacket.ID, ClientboundSyncGuildsPacket.HANDLER, ClientboundSyncGuildsPacket.class);
-        CHANNEL.registerPacket(NetworkDirection.SERVER_TO_CLIENT, ClientboundSyncPartiesPacket.ID, ClientboundSyncPartiesPacket.HANDLER, ClientboundSyncPartiesPacket.class);
     }
 }

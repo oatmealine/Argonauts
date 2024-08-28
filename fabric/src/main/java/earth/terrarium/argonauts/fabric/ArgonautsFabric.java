@@ -18,6 +18,5 @@ public class ArgonautsFabric implements ModInitializer {
         }
         CommandRegistrationCallback.EVENT.register(ModCommands::register);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> Argonauts.onPlayerJoin(handler.player));
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> Argonauts.onPlayerLeave(handler.player));
     }
 }

@@ -34,10 +34,6 @@ public class GuildMembersScreen extends MembersScreen {
 
     @Override
     public void additionalEntries(MemberSettingList list, Member member, boolean cantModify, Member self) {
-        if (Argonauts.isCadmusLoaded()) {
-            list.addEntry(new DividerEntry(ConstantComponents.CADMUS_PERMISSIONS));
-            list.addEntry(new BooleanEntry(MemberPermissions.TEMPORARY_GUILD_PERMISSIONS, member.hasPermission(MemberPermissions.TEMPORARY_GUILD_PERMISSIONS), !cantModify && this.menuContent.canManagePermissions() && self.hasPermission(MemberPermissions.TEMPORARY_GUILD_PERMISSIONS), this::groupType, () -> this.menuContent.getSelected().profile().getId()));
-        }
     }
 
     @Override

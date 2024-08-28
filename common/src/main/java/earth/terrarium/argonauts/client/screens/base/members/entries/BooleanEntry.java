@@ -6,11 +6,9 @@ import com.teamresourceful.resourcefullib.client.scissor.ScissorBoxStack;
 import com.teamresourceful.resourcefullib.client.screens.CursorScreen;
 import com.teamresourceful.resourcefullib.client.utils.CursorUtils;
 import earth.terrarium.argonauts.Argonauts;
-import earth.terrarium.argonauts.client.screens.party.settings.PartySettingsScreen;
 import earth.terrarium.argonauts.common.handlers.GroupType;
 import earth.terrarium.argonauts.common.network.NetworkHandler;
 import earth.terrarium.argonauts.common.network.messages.ServerboundSetPermissionPacket;
-import earth.terrarium.argonauts.common.network.messages.ServerboundSetSettingPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -77,11 +75,11 @@ public class BooleanEntry extends ListEntry {
             if (x > 156 && x < 179) {
                 value = !value;
                 if (prefix.equals("setting")) {
-                    NetworkHandler.CHANNEL.sendToServer(new ServerboundSetSettingPacket(
+                    /*NetworkHandler.CHANNEL.sendToServer(new ServerboundSetSettingPacket(
                         id,
                         value,
                         getMember.get(),
-                        Minecraft.getInstance().screen instanceof PartySettingsScreen s && s.menuContent().partySettings()));
+                        Minecraft.getInstance().screen instanceof PartySettingsScreen s && s.menuContent().partySettings()));*/
                 } else if (prefix.equals("permission")) {
                     NetworkHandler.CHANNEL.sendToServer(new ServerboundSetPermissionPacket(
                         id,
