@@ -1,8 +1,10 @@
 package earth.terrarium.argonauts;
 
-import dev.architectury.event.events.common.PlayerEvent;
+import com.teamresourceful.resourcefullib.common.utils.modinfo.ModInfoUtils;
 import earth.terrarium.argonauts.api.guild.Guild;
 import earth.terrarium.argonauts.api.guild.GuildApi;
+import earth.terrarium.argonauts.common.compat.cadmus.CadmusIntegration;
+import earth.terrarium.argonauts.common.compat.heracles.HeraclesIntegration;
 import earth.terrarium.argonauts.common.constants.ConstantComponents;
 import earth.terrarium.argonauts.common.network.NetworkHandler;
 import earth.terrarium.argonauts.common.network.messages.ClientboundSyncGuildsPacket;
@@ -15,6 +17,7 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Argonauts {
@@ -22,30 +25,18 @@ public class Argonauts {
 
     public static void init() {
         NetworkHandler.init();
-
-        PlayerEvent.PLAYER_ADVANCEMENT.register(((player, advancement) -> {
-            Guild guild = GuildApi.API.get(player);
-            if (guild == null) return;
-            if (!guild.syncAdvancements()) return;
-            PlayerList players = player.server.getPlayerList();
-
-            guild.members().forEach(member -> {
-                ServerPlayer otherPlayer = players.getPlayer(member.profile().getId());
-                if (otherPlayer == null) return;
-
-                AdvancementProgress advancementprogress = otherPlayer.getAdvancements().getOrStartProgress(advancement);
-                if (!advancementprogress.isDone()) {
-                    for(String s : advancementprogress.getRemainingCriteria()) {
-                        otherPlayer.getAdvancements().award(advancement, s);
-                    }
-                }
-            });
-        }));
+        if (isCadmusLoaded()) {
+            CadmusIntegration.init();
+        }
+        if (isHeraclesLoaded()) {
+            HeraclesIntegration.init();
+        }
     }
 
     public static void onPlayerJoin(Player player) {
         if (player.level().isClientSide()) return;
         NetworkHandler.CHANNEL.sendToPlayer(new ClientboundSyncGuildsPacket(new HashSet<>(GuildApi.API.getAll(player.getServer())), Set.of()), player);
+        //NetworkHandler.CHANNEL.sendToPlayer(new ClientboundSyncPartiesPacket(new HashSet<>(PartyApi.API.getAll()), Set.of()), player);
         Guild guild = GuildApi.API.get((ServerPlayer) player);
         if (guild == null) return;
 
@@ -88,5 +79,13 @@ public class Argonauts {
                 }
             });
         }
+    }
+
+    public static boolean isCadmusLoaded() {
+        return ModInfoUtils.isModLoaded("cadmus");
+    }
+
+    public static boolean isHeraclesLoaded() {
+        return ModInfoUtils.isModLoaded("heracles");
     }
 }

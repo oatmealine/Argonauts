@@ -2,6 +2,7 @@ package earth.terrarium.argonauts.compat.fabric.placeholderapi;
 
 import earth.terrarium.argonauts.Argonauts;
 import earth.terrarium.argonauts.api.guild.GuildApi;
+import earth.terrarium.argonauts.api.party.PartyApi;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;

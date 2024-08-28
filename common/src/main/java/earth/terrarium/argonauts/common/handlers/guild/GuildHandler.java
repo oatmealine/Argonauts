@@ -3,8 +3,11 @@ package earth.terrarium.argonauts.common.handlers.guild;
 import com.teamresourceful.resourcefullib.common.lib.Constants;
 import com.teamresourceful.resourcefullib.common.utils.CommonUtils;
 import com.teamresourceful.resourcefullib.common.utils.SaveHandler;
+import earth.terrarium.argonauts.Argonauts;
 import earth.terrarium.argonauts.api.guild.Guild;
 import earth.terrarium.argonauts.api.guild.GuildApi;
+import earth.terrarium.argonauts.common.compat.cadmus.CadmusIntegration;
+import earth.terrarium.argonauts.common.compat.heracles.HeraclesIntegration;
 import earth.terrarium.argonauts.common.handlers.base.MemberException;
 import earth.terrarium.argonauts.common.handlers.base.members.Member;
 import earth.terrarium.argonauts.common.handlers.guild.members.GuildMembers;
@@ -112,6 +115,12 @@ public class GuildHandler extends SaveHandler implements GuildApi {
         player.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.member.guild_create", guild.settings().displayName().getString()), false);
 
         EventUtils.created(guild, player);
+        if (Argonauts.isCadmusLoaded()) {
+            CadmusIntegration.addToCadmusTeam(player, id.toString());
+        }
+        if (Argonauts.isHeraclesLoaded()) {
+            HeraclesIntegration.updateHeraclesChanger(player);
+        }
     }
 
     @Nullable
@@ -165,6 +174,12 @@ public class GuildHandler extends SaveHandler implements GuildApi {
         player.displayClientMessage(CommonUtils.serverTranslatable("text.argonauts.member.guild_join", guild.settings().displayName().getString()), false);
 
         EventUtils.joined(guild, player);
+        if (Argonauts.isCadmusLoaded()) {
+            CadmusIntegration.addToCadmusTeam(player, guild.id().toString());
+        }
+        if (Argonauts.isHeraclesLoaded()) {
+            HeraclesIntegration.updateHeraclesChanger(player);
+        }
     }
 
     @Override
@@ -191,6 +206,12 @@ public class GuildHandler extends SaveHandler implements GuildApi {
         ModUtils.sendToAllClientPlayers(new ClientboundSyncGuildsPacket(Set.of(guild), Set.of()), player.server);
 
         EventUtils.left(guild, player);
+        if (Argonauts.isCadmusLoaded()) {
+            CadmusIntegration.removeFromCadmusTeam(player, id.toString());
+        }
+        if (Argonauts.isHeraclesLoaded()) {
+            HeraclesIntegration.updateHeraclesChanger(player);
+        }
     }
 
     @Override
@@ -208,6 +229,12 @@ public class GuildHandler extends SaveHandler implements GuildApi {
         data.guilds.remove(guild.id());
         ModUtils.sendToAllClientPlayers(new ClientboundSyncGuildsPacket(Set.of(), Set.of(guild.id())), server);
         EventUtils.removed(force, guild);
+        if (Argonauts.isCadmusLoaded()) {
+            CadmusIntegration.disbandCadmusTeam(guild, server);
+        }
+        if (Argonauts.isHeraclesLoaded()) {
+            guild.members().forEach(m -> HeraclesIntegration.updateHeraclesChanger(server.overworld(), m.profile().getId()));
+        }
         data.updateInternal();
     }
 

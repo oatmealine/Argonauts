@@ -5,6 +5,7 @@ import com.teamresourceful.resourcefullib.common.networking.base.PacketContext;
 import com.teamresourceful.resourcefullib.common.networking.base.PacketHandler;
 import earth.terrarium.argonauts.Argonauts;
 import earth.terrarium.argonauts.api.guild.GuildApi;
+import earth.terrarium.argonauts.api.party.PartyApi;
 import earth.terrarium.argonauts.common.commands.base.CommandHelper;
 import earth.terrarium.argonauts.common.handlers.GroupType;
 import earth.terrarium.argonauts.common.handlers.base.MemberException;
@@ -57,7 +58,12 @@ public record ServerboundSetPermissionPacket(String permission,
         public PacketContext handle(ServerboundSetPermissionPacket message) {
             return (player, level) ->
                 CommandHelper.runNetworkAction(player, () -> {
-                    Group<?, ?> group = GuildApi.API.get((ServerPlayer) player);
+                    Group<?, ?> group = null;
+                    if (message.type == GroupType.GUILD) {
+                        group = GuildApi.API.get((ServerPlayer) player);
+                    } else if (message.type == GroupType.PARTY) {
+                        group = PartyApi.API.get(player);
+                    }
                     if (group == null) return;
 
                     Member member = group.getMember(player);
