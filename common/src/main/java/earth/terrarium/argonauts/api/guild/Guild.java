@@ -54,6 +54,10 @@ public final class Guild extends Group<GuildMember, GuildMembers> {
         return this.settings.color();
     }
 
+    public boolean syncAdvancements() {
+        return this.settings.syncAdvancements();
+    }
+
     public static final ByteCodec<Guild> BYTE_CODEC = ObjectByteCodec.create(
         ByteCodec.UUID.fieldOf(Guild::id),
         GuildSettings.BYTE_CODEC.fieldOf(Guild::settings),

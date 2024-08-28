@@ -19,15 +19,17 @@ public class GuildSettings {
     private Component motd = CommonComponents.EMPTY;
     private ChatFormatting color = ChatFormatting.AQUA;
     private boolean allowFakePlayers;
+    private boolean syncAdvancements;
 
     public GuildSettings() {}
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public GuildSettings(Component displayName, Component motd, ChatFormatting color, boolean allowFakePlayers) {
+    public GuildSettings(Component displayName, Component motd, ChatFormatting color, boolean allowFakePlayers, boolean syncAdvancements) {
         this.displayName = displayName;
         this.motd = motd;
         this.color = color;
         this.allowFakePlayers = allowFakePlayers;
+        this.syncAdvancements = syncAdvancements;
     }
 
     public void setDisplayName(Component displayName) {
@@ -62,11 +64,16 @@ public class GuildSettings {
         return allowFakePlayers;
     }
 
+    public void setSyncAdvancements(boolean syncAdvancements) { this.syncAdvancements = syncAdvancements; }
+
+    public boolean syncAdvancements() { return syncAdvancements; }
+
     public static final ByteCodec<GuildSettings> BYTE_CODEC = ObjectByteCodec.create(
         ExtraByteCodecs.COMPONENT.fieldOf(GuildSettings::displayName),
         ExtraByteCodecs.COMPONENT.fieldOf(GuildSettings::motd),
         ByteCodec.ofEnum(ChatFormatting.class).fieldOf(GuildSettings::color),
         ByteCodec.BOOLEAN.fieldOf(GuildSettings::allowFakePlayers),
+        ByteCodec.BOOLEAN.fieldOf(GuildSettings::syncAdvancements),
         GuildSettings::new
     );
 }

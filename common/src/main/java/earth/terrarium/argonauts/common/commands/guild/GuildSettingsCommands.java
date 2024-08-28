@@ -29,6 +29,7 @@ public final class GuildSettingsCommands {
                 .then(motd())
                 .then(color())
                 .then(allowFakePlayers())
+                .then(syncAdvancements())
             ));
     }
 
@@ -106,6 +107,22 @@ public final class GuildSettingsCommands {
                 CommandHelper.runAction(() -> {
                     Guild guild = GuildCommandHelper.getGuildOrThrow(player, false);
                     player.displayClientMessage(getCurrentComponent("color", guild.color().name().toLowerCase(Locale.ROOT)), false);
+                });
+                return 1;
+            });
+    }
+
+    private static ArgumentBuilder<CommandSourceStack, LiteralArgumentBuilder<CommandSourceStack>> syncAdvancements() {
+        return Commands.literal("syncAdvancements")
+            .executes(context -> {
+                ServerPlayer player = context.getSource().getPlayerOrException();
+                CommandHelper.runAction(() -> {
+                    Guild guild = GuildCommandHelper.getGuildOrThrow(player, false);
+                    if (!guild.members().isLeader(player.getUUID())) {
+                        throw MemberException.YOU_ARE_NOT_THE_OWNER_OF_GUILD;
+                    }
+                    guild.settings().setSyncAdvancements(!guild.settings().syncAdvancements());
+                    player.displayClientMessage(getCurrentComponent("syncAdvancements", String.valueOf(guild.settings().syncAdvancements())), false);
                 });
                 return 1;
             });
